@@ -2,7 +2,7 @@
 
 Um aplicativo web simples que permite traduzir um texto de entrada para múltiplos idiomas simultaneamente. Utiliza a API Google Gemini para as traduções e a API de Síntese de Fala (Web Speech API) para produzir áudio das traduções.
 
-> Recomendação: tire um print da tela do seu aplicativo funcionando e adicione a imagem aqui para facilitar a visualização.
+> (print)
 
 ## Funcionalidades principais
 
@@ -69,3 +69,4 @@ Siga o fluxo usual:
 Projeto open source — sinta-se à vontade para usar, modificar e distribuir como desejar.
 
 ```
+
