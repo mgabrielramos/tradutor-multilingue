@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tradutor Múltiplo com Áudio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilo para a barra de rolagem do seletor de idiomas */
+        .language-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        .language-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .language-list::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .language-list::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .loader {
+            border-top-color: #3498db;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-6">
+        <!-- Cabeçalho -->
+        <header class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Tradutor Múltiplo Inteligente</h1>
+            <p class="text-gray-500 mt-2">Traduza para vários idiomas e ouça a pronúncia com um clique.</p>
+        </header>
+
+        <!-- Controles de Idioma -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="source-lang" class="block text-sm font-medium text-gray-700 mb-1">Idioma de Origem</label>
+                <select id="source-lang" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    <option value="auto" selected>Detectar Idioma</option>
+                </select>
+            </div>
+            <div class="relative">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Idiomas de Saída</label>
+                <button id="target-lang-btn" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 text-left flex justify-between items-center">
+                    <span id="target-lang-placeholder">Selecione os idiomas</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="target-lang-dropdown" class="hidden absolute z-10 w-full mt-1 bg-white rounded-lg shadow-lg border max-h-60 overflow-y-auto language-list">
+                    <!-- Opções de idioma de saída serão inseridas aqui -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Área de Texto e Botão -->
+        <div class="space-y-4">
+            <textarea id="text-input" rows="6" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-4 placeholder-gray-400" placeholder="Digite o texto para traduzir..."></textarea>
+            <button id="translate-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+                Traduzir
+            </button>
+        </div>
+
+        <!-- Resultados -->
+        <div id="results-container" class="space-y-4">
+            <!-- As traduções aparecerão aqui -->
+        </div>
+
+        <!-- Indicador de Carregamento -->
+        <div id="loader" class="hidden items-center justify-center gap-3 text-gray-600">
+            <div class="loader h-8 w-8 rounded-full border-4 border-gray-200"></div>
+            <span class="text-lg">Traduzindo, por favor aguarde...</span>
+        </div>
+
+        <!-- Mensagem de Erro -->
+        <div id="error-message" class="hidden p-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+            <!-- Mensagem de erro -->
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sourceLangSelect = document.getElementById('source-lang');
+            const targetLangBtn = document.getElementById('target-lang-btn');
+            const targetLangPlaceholder = document.getElementById('target-lang-placeholder');
+            const targetLangDropdown = document.getElementById('target-lang-dropdown');
+            const textInput = document.getElementById('text-input');
+            const translateBtn = document.getElementById('translate-btn');
+            const resultsContainer = document.getElementById('results-container');
+            const loader = document.getElementById('loader');
+            const errorMessage = document.getElementById('error-message');
+
+            const languages = {
+                'pt-BR': 'Português (Brasil)',
+                'en-US': 'Inglês (EUA)',
+                'es-ES': 'Espanhol (Espanha)',
+                'fr-FR': 'Francês (França)',
+                'de-DE': 'Alemão (Alemanha)',
+                'it-IT': 'Italiano (Itália)',
+                'ja-JP': 'Japonês (Japão)',
+                'ko-KR': 'Coreano (Coreia do Sul)',
+                'ru-RU': 'Russo (Rússia)',
+                'zh-CN': 'Chinês (Mandarim)',
+                'ar-SA': 'Árabe (Arábia Saudita)',
+                'hi-IN': 'Hindi (Índia)'
+            };
+
+            // Popula os seletores de idioma
+            function populateLanguages() {
+                let targetHtml = '';
+                for (const [code, name] of Object.entries(languages)) {
+                    // Adiciona ao seletor de origem
+                    const option = new Option(name, code);
+                    sourceLangSelect.add(option);
+                    
+                    // Adiciona ao dropdown de destino
+                    targetHtml += `
+                        <label class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                            <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-lang-code="${code}">
+                            <span class="ml-3 text-sm text-gray-800">${name}</span>
+                        </label>
+                    `;
+                }
+                targetLangDropdown.innerHTML = targetHtml;
+            }
+
+            // Lógica do dropdown de seleção múltipla
+            targetLangBtn.addEventListener('click', () => {
+                targetLangDropdown.classList.toggle('hidden');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!targetLangBtn.contains(e.target) && !targetLangDropdown.contains(e.target)) {
+                    targetLangDropdown.classList.add('hidden');
+                }
+            });
+
+            targetLangDropdown.addEventListener('change', () => {
+                const selected = targetLangDropdown.querySelectorAll('input[type="checkbox"]:checked');
+                if (selected.length === 0) {
+                    targetLangPlaceholder.textContent = 'Selecione os idiomas';
+                } else if (selected.length === 1) {
+                    const code = selected[0].dataset.langCode;
+                    targetLangPlaceholder.textContent = languages[code];
+                } else {
+                    targetLangPlaceholder.textContent = `${selected.length} idiomas selecionados`;
+                }
+            });
+
+
+            // Função para falar o texto
+            function speakText(text, lang) {
+                // Cancela qualquer fala anterior
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang;
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+
+            // Exibe os resultados
+            function displayResults(translations) {
+                resultsContainer.innerHTML = '';
+                for (const [langCode, translatedText] of Object.entries(translations)) {
+                    const langName = languages[langCode] || langCode;
+                    const resultCard = document.createElement('div');
+                    resultCard.className = 'bg-gray-50 p-4 rounded-lg border border-gray-200';
+                    resultCard.innerHTML = `
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-md font-semibold text-gray-800">${langName}</h3>
+                            <button class="speak-btn text-gray-500 hover:text-blue-600 transition-colors" data-text="${escape(translatedText)}" data-lang="${langCode}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                            </button>
+                        </div>
+                        <p class="text-gray-700">${translatedText}</p>
+                    `;
+                    resultsContainer.appendChild(resultCard);
+                }
+
+                // Adiciona event listeners aos novos botões de áudio
+                document.querySelectorAll('.speak-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const text = unescape(btn.dataset.text);
+                        const lang = btn.dataset.lang;
+                        speakText(text, lang);
+                    });
+                });
+            }
+            
+            // Função de tradução
+            async function handleTranslate() {
+                const textToTranslate = textInput.value.trim();
+                const sourceLang = sourceLangSelect.value;
+                const targetLangs = Array.from(targetLangDropdown.querySelectorAll('input:checked')).map(input => input.dataset.langCode);
+
+                if (!textToTranslate) {
+                    showError("Por favor, insira um texto para traduzir.");
+                    return;
+                }
+                if (targetLangs.length === 0) {
+                    showError("Por favor, selecione pelo menos um idioma de saída.");
+                    return;
+                }
+                
+                hideError();
+                loader.style.display = 'flex';
+                resultsContainer.innerHTML = '';
+                translateBtn.disabled = true;
+
+                const apiKey = ""; // A chave da API será fornecida pelo ambiente
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                const systemPrompt = `Você é um especialista em tradução. Sua tarefa é traduzir o texto fornecido para os idiomas de destino especificados. Você DEVE retornar a resposta em um formato JSON. O objeto JSON deve ter uma única chave chamada "translations". O valor desta chave deve ser outro objeto, onde cada chave é o código de idioma BCP-47 (ex: 'en-US', 'pt-BR') e seu valor é o texto traduzido. Não inclua nenhuma outra informação, explicação ou texto fora do objeto JSON.`;
+                
+                const userQuery = `Traduza o seguinte texto a partir do idioma '${sourceLang === 'auto' ? 'detecção automática' : languages[sourceLang]}' para os seguintes idiomas: ${targetLangs.map(code => languages[code]).join(', ')}. Códigos de idioma: ${targetLangs.join(', ')}.\n\nTexto: "${textToTranslate}"`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                    }
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorBody = await response.text();
+                        console.error("Corpo do erro da API:", errorBody);
+                        throw new Error(`Erro na API: ${response.status} ${response.statusText}`);
+                    }
+                    
+                    const result = await response.json();
+                    
+                    console.log("Resposta da API:", JSON.stringify(result, null, 2));
+
+                    if (!result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                        console.error("Estrutura de resposta inválida:", result);
+                        throw new Error("A resposta da API não continha o texto esperado.");
+                    }
+
+                    const jsonText = result.candidates[0].content.parts[0].text;
+                    const parsedJson = JSON.parse(jsonText);
+
+                    if (parsedJson && parsedJson.translations) {
+                        displayResults(parsedJson.translations);
+                    } else {
+                        console.error("O JSON parseado não contém a chave 'translations':", parsedJson);
+                        throw new Error("A resposta da API não continha as traduções no formato esperado.");
+                    }
+
+                } catch (error) {
+                    console.error("Erro ao traduzir:", error);
+                    showError("Ocorreu um erro ao tentar traduzir. Por favor, tente novamente.");
+                } finally {
+                    loader.style.display = 'none';
+                    translateBtn.disabled = false;
+                }
+            }
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.classList.remove('hidden');
+            }
+
+            function hideError() {
+                errorMessage.classList.add('hidden');
+            }
+
+            translateBtn.addEventListener('click', handleTranslate);
+            populateLanguages();
+        });
+    </script>
+</body>
+</html>
