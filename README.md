@@ -1,30 +1,71 @@
-Tradutor Múltiplo Inteligente
-Este é um aplicativo web simples que permite ao usuário traduzir um texto de entrada para múltiplos idiomas simultaneamente. Ele utiliza a API Google Gemini para as traduções e a API de Síntese de Fala (Web Speech API) nativa do navegador para permitir que o usuário ouça a pronúncia.
-(Recomendação: Tire um print da tela do seu aplicativo funcionando e adicione a imagem aqui para uma visualização rápida.)
-Funcionalidades Principais
-Tradução Múltipla: Traduz um único texto para vários idiomas de uma só vez.
-Detecção de Idioma: Pode detectar automaticamente o idioma de origem.
-Seleção de Saída: Interface amigável para selecionar múltiplos idiomas de destino.
-Saída de Áudio: Permite ouvir a pronúncia de cada tradução usando a API de fala do navegador.
-Interface Responsiva: Construído com Tailwind CSS para funcionar bem em desktops e dispositivos móveis.
-Feedback ao Usuário: Inclui indicadores de carregamento e mensagens de erro claras.
-Tecnologias Utilizadas
-HTML5
-Tailwind CSS (utilizado via CDN)
-JavaScript (ES6+)
-Google Gemini API (para o processamento da tradução)
-Web Speech API (SpeechSynthesis) (para a funcionalidade de áudio)
-Como Usar
-Este projeto é autocontido em um único arquivo translator.html e não requer instalação ou um servidor complexo.
-Clone ou Baixe o Repositório
-Você pode clonar este repositório: git clone [URL_DO_SEU_REPOSITORIO_AQUI]
-Ou simplesmente baixar o arquivo translator.html.
-Abra o Arquivo
-Abra o arquivo translator.html diretamente no seu navegador web preferido (como Google Chrome, Firefox, Edge, etc.).
-Use o App
-Selecione o idioma de origem (ou deixe em "Detectar Idioma").
-Selecione um ou mais idiomas de saída.
-Digite o texto e clique em "Traduzir".
-Nota Importante: A funcionalidade de tradução depende da API Gemini e requer uma conexão ativa com a internet para funcionar.
-Licença
-Este é um projeto de código aberto. Sinta-se à vontade para usar, modificar e distribuir como desejar.
+# Tradutor Múltiplo Inteligente
+
+Um aplicativo web simples que permite traduzir um texto de entrada para múltiplos idiomas simultaneamente. Utiliza a API Google Gemini para as traduções e a API de Síntese de Fala (Web Speech API) para produzir áudio das traduções.
+
+> Recomendação: tire um print da tela do seu aplicativo funcionando e adicione a imagem aqui para facilitar a visualização.
+
+## Funcionalidades principais
+
+- Tradução múltipla — traduz um único texto para vários idiomas ao mesmo tempo.
+- Detecção de idioma — identifica automaticamente o idioma de entrada (opcional).
+- Seleção de saída — interface para selecionar múltiplos idiomas de destino.
+- Saída de áudio — permite ouvir a pronúncia de cada tradução usando a Web Speech API (SpeechSynthesis).
+- Interface responsiva — construída com Tailwind CSS via CDN, funciona bem em desktop e dispositivos móveis.
+- Feedback ao usuário — inclui indicadores de carregamento e mensagens de erro claras.
+
+## Tecnologias utilizadas
+
+- HTML5
+- Tailwind CSS (via CDN)
+- JavaScript (ES6+)
+- Google Gemini API (para tradução)
+- Web Speech API (SpeechSynthesis) (para reprodução de áudio)
+
+## Como usar
+
+Este projeto é autocontido em um único arquivo `translator.html` e não requer instalação ou um servidor complexo.
+
+1. Clone ou baixe o repositório:
+   ```bash
+   git clone https://github.com/mgabrielramos/tradutor-multilingue.git
+   ```
+   Ou apenas baixe o arquivo `translator.html`.
+
+2. Abra o arquivo:
+   - Abra `translator.html` diretamente no seu navegador (Chrome, Firefox, Edge, etc.).
+
+3. Usando o app:
+   - Selecione o idioma de origem (ou deixe em "Detectar Idioma").
+   - Selecione um ou mais idiomas de saída.
+   - Digite o texto e clique em "Traduzir".
+   - Para ouvir uma tradução, utilize o botão de áudio correspondente (caso implementado).
+
+### Observações importantes
+- A funcionalidade de tradução depende da API Google Gemini e requer uma chave de API válida e conexão ativa com a internet.
+- A reprodução de áudio depende da Web Speech API, que pode ter diferenças de suporte entre navegadores. Para melhor compatibilidade, use navegadores atualizados (Chrome/Edge baseados em Chromium geralmente têm suporte mais completo).
+
+## Exemplo de integração com a API (orientação)
+- No arquivo `translator.html` você deve configurar onde a chamada à Google Gemini é feita (por exemplo, via fetch para seu backend que contém a chave da API).
+- Nunca exponha sua chave da API em código cliente (front-end). Sempre encaminhe requisições de tradução por um servidor seguro que armazene a chave.
+
+## Compatibilidade de navegadores
+- Chrome, Edge (Chromium) — recomendado.
+- Firefox — suporta a maior parte da funcionalidade, mas teste a síntese de fala.
+- Safari — verificar suporte à Web Speech API em versões recentes.
+
+## Contribuindo
+Contribuições são bem-vindas. Você pode:
+- Abrir issues para reportar bugs ou pedir funcionalidades.
+- Enviar pull requests com correções ou melhorias.
+- Adicionar traduções, testes, ou melhorar a interface.
+
+Siga o fluxo usual:
+1. Fork do repositório
+2. Crie uma branch com a sua feature (`git checkout -b minha-feature`)
+3. Faça commits descritivos
+4. Abra um Pull Request explicando suas mudanças
+
+## Licença
+Projeto open source — sinta-se à vontade para usar, modificar e distribuir como desejar.
+
+```
