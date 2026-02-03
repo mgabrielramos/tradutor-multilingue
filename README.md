@@ -48,6 +48,28 @@ Este projeto é autocontido em um único arquivo `translator.html` e não requer
 - No arquivo `translator.html` você deve configurar onde a chamada à Google Gemini é feita (por exemplo, via fetch para seu backend que contém a chave da API).
 - Nunca exponha sua chave da API em código cliente (front-end). Sempre encaminhe requisições de tradução por um servidor seguro que armazene a chave.
 
+## Próximos passos para publicação na Play Store
+Este projeto começou como um app web simples. Para torná-lo profissional e pronto para venda, siga os guias abaixo:
+
+- **Flutter (app nativo)**: guia de migração, arquitetura e estrutura recomendada. Veja `docs/FLUTTER.md`.
+- **Backend seguro**: referência para proteger a chave da API, autenticação e rate limiting. Veja `docs/BACKEND.md`.
+- **Políticas legais (LGPD/Play Store)**: modelos e checklist. Veja `docs/LEGAL.md`.
+- **Monetização Freemium**: sugestões de planos e limites. Veja `docs/MONETIZATION.md`.
+- **Roadmap profissional**: sequência sugerida para evoluir o produto. Veja `docs/ROADMAP.md`.
+
+## Implementação inicial (Flutter + Backend)
+Foram adicionadas bases mínimas para começar a implementação:
+
+- **Backend Node.js**: `backend/` (Express, JWT, rate limiting, endpoints de autenticação e tradução).
+- **App Flutter**: `mobile/` (tela principal com tradução e indicação de uso do plano).
+- **Políticas legais**: `legal/` (templates de Termos e Política de Privacidade).
+
+### Como rodar o backend
+1. `cd backend`
+2. `cp .env.example .env` e configure as variáveis.
+3. `npm install`
+4. `npm run dev`
+
 ## Compatibilidade de navegadores
 - Chrome, Edge (Chromium) — recomendado.
 - Firefox — suporta a maior parte da funcionalidade, mas teste a síntese de fala.
